@@ -413,6 +413,11 @@ void gcm_ghash_rv64i_zbc(u64 Xi[2], const u128 Htable[16],
                          const u8 *inp, size_t len);
 void gcm_ghash_rv64i_zbc__zbkb(u64 Xi[2], const u128 Htable[16],
                                const u8 *inp, size_t len);
+/* Zvkb (vector crypto with vclmul) based routines. */
+void gcm_init_rv64i_zvkb(u128 Htable[16], const u64 Xi[2]);
+void gcm_gmult_rv64i_zvkb(u64 Xi[2], const u128 Htable[16]);
+void gcm_ghash_rv64i_zvkb(u64 Xi[2], const u128 Htable[16],
+                          const u8 *inp, size_t len);
 # endif
 #endif
 
@@ -512,7 +517,11 @@ static void gcm_get_funcs(struct gcm_funcs_st *ctx)
     ctx->gmult = gcm_gmult_4bit;
     ctx->ghash = gcm_ghash_4bit;
 
-    if (RISCV_HAS_ZBC()) {
+    if (RISCV_HAS_ZVKB()) {
+        ctx->ginit = gcm_init_rv64i_zvkb;
+        ctx->gmult = gcm_gmult_rv64i_zvkb;
+        ctx->ghash = gcm_ghash_rv64i_zvkb;
+    } else if (RISCV_HAS_ZBC()) {
         if (RISCV_HAS_ZBKB()) {
             ctx->ginit = gcm_init_rv64i_zbc__zbkb;
             ctx->gmult = gcm_gmult_rv64i_zbc__zbkb;
