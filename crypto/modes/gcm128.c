@@ -418,6 +418,13 @@ void gcm_init_rv64i_zvkb(u128 Htable[16], const u64 Xi[2]);
 void gcm_gmult_rv64i_zvkb(u64 Xi[2], const u128 Htable[16]);
 void gcm_ghash_rv64i_zvkb(u64 Xi[2], const u128 Htable[16],
                           const u8 *inp, size_t len);
+/* Zvkg (vector crypto with vghmac.vv). */
+void gcm_init_rv64i_zvkg(u128 Htable[16], const u64 Xi[2]);
+void gcm_init_rv64i_zvkg__zbb_or_zbkb(u128 Htable[16], const u64 Xi[2]);
+void gcm_init_rv64i_zvkg__zvkb(u128 Htable[16], const u64 Xi[2]);
+void gcm_gmult_rv64i_zvkg(u64 Xi[2], const u128 Htable[16]);
+void gcm_ghash_rv64i_zvkg(u64 Xi[2], const u128 Htable[16],
+                          const u8 *inp, size_t len);
 # endif
 #endif
 
@@ -517,7 +524,16 @@ static void gcm_get_funcs(struct gcm_funcs_st *ctx)
     ctx->gmult = gcm_gmult_4bit;
     ctx->ghash = gcm_ghash_4bit;
 
-    if (RISCV_HAS_ZVKB()) {
+    if (RISCV_HAS_ZVKG()) {
+        if (RISCV_HAS_ZVKB())
+            ctx->ginit = gcm_init_rv64i_zvkg__zvkb;
+        else if (RISCV_HAS_ZBB_OR_ZBKB())
+            ctx->ginit = gcm_init_rv64i_zvkg__zbb_or_zbkb;
+        else
+            ctx->ginit = gcm_init_rv64i_zvkg;
+        ctx->gmult = gcm_gmult_rv64i_zvkg;
+        ctx->ghash = gcm_ghash_rv64i_zvkg;
+    } else if (RISCV_HAS_ZVKB()) {
         ctx->ginit = gcm_init_rv64i_zvkb;
         ctx->gmult = gcm_gmult_rv64i_zvkb;
         ctx->ghash = gcm_ghash_rv64i_zvkb;

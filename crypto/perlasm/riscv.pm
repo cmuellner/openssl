@@ -448,4 +448,16 @@ sub vrev8_v {
     return ".word ".($template | ($vs2 << 20) | ($vd << 7));
 }
 
+## Zvkg instructions
+
+sub vghmac_vv {
+    # vhgmac.vv vd, vs2, vs1
+    my $template = 0b1011001_00000_00000_010_00000_1110111;
+    my $vd = read_vreg shift;
+    my $vs2 = read_vreg shift;
+    my $vs1 = read_vreg shift;
+
+    return ".word ".($template | ($vs2 << 20) | ($vs1 << 15) | ($vd << 7));
+}
+
 1;
