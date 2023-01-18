@@ -57,7 +57,6 @@ static const size_t kRISCVNumCaps =
 ;
 
 /* Extension combination tests. */
-#define RISCV_HAS_ZBB_AND_ZBC() (RISCV_HAS_ZBB() && RISCV_HAS_ZBC())
 #define RISCV_HAS_ZBKB_AND_ZKND_AND_ZKNE() (RISCV_HAS_ZKNB() && RISCV_HAS_ZKND() && RISCV_HAS_ZKNE())
 #define RISCV_HAS_ZKND_AND_ZKNE() (RISCV_HAS_ZKND() && RISCV_HAS_ZKNE())
 
