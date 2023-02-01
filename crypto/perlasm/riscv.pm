@@ -460,4 +460,21 @@ sub vghmac_vv {
     return ".word ".($template | ($vs2 << 20) | ($vs1 << 15) | ($vd << 7));
 }
 
+sub vgmult_vv {
+    # vgmult.vv vd, vs2
+    my $template = 0b1010011_00000_01000_010_00000_1110111;
+    my $vd = read_vreg shift;
+    my $vs2 = read_vreg shift;
+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
+}
+
+sub vghash_vv {
+    # vghash.vv vd, vs2, vs1
+    my $template = 0b1000111_00000_00000_010_00000_1110111;
+    my $vd = read_vreg shift;
+    my $vs2 = read_vreg shift;
+    my $vs1 = read_vreg shift;
+    return ".word ".($template | ($vs2 << 20) | ($vs1 << 15) | ($vd << 7));
+}
+
 1;

@@ -99,7 +99,7 @@ ___
 # output: Xi: next hash value Xi
 {
 my ($Xi,$Htable) = ("a0","a1");
-my ($VD,$VS1,$VS2) = ("v1","v2","v3");
+my ($VD,$VS2) = ("v1","v2");
 
 $code .= <<___;
 .p2align 3
@@ -107,12 +107,9 @@ $code .= <<___;
 .type gcm_gmult_rv64i_zvkg,\@function
 gcm_gmult_rv64i_zvkg:
     @{[vsetivli__x0_4_e32_m1_ta_ma]}
-    @{[vle32_v $VS1, $Htable]}
+    @{[vle32_v $VS2, $Htable]}
     @{[vle32_v $VD, $Xi]}
-    # Use a zero-block as input
-    # This works because zero is the neutral element of XOR
-    @{[vmv_v_i $VS2, 0]}
-    @{[vghmac_vv $VD, $VS2, $VS1]}
+    @{[vgmult_vv $VD, $VS2]}
     @{[vse32_v $VD, $Xi]}
     ret
 .size gcm_gmult_rv64i_zvkg,.-gcm_gmult_rv64i_zvkg
@@ -141,24 +138,12 @@ gcm_ghash_rv64i_zvkg:
     @{[vle32_v $vH, $Htable]}
     @{[vle32_v $vXi, $Xi]}
 
-    # First loop part
-    @{[vle32_v $vinp, $inp]}
-    @{[vxor_vv $vXi, $vXi, $vinp]}
-    add $inp, $inp, 16
-    add $len, $len, -16
-    beqz $len, Lend
-
 Lstep:
     @{[vle32_v $vinp, $inp]}
     add $inp, $inp, 16
     add $len, $len, -16
-    @{[vghmac_vv $vXi, $vinp, $vH]}
+    @{[vghash_vv $vXi, $vinp, $vH]}
     bnez $len, Lstep
-
-Lend:
-    # Final multiplication (no XOR operation)
-    @{[vmv_v_i $Vzero, 0]}
-    @{[vghmac_vv $vXi, $Vzero, $vH]}
 
     @{[vse32_v $vXi, $Xi]}
     ret
